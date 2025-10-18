@@ -5,18 +5,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @SpringBootApplication
 @RestController
 public class SandboxApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SandboxApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SandboxApplication.class, args);
+    }
 
 
-
-	@GetMapping("/get")
-	public String display() {
-		return "another massive Update display message, Version 3 !";
-	}
+    @GetMapping("/get")
+    public List<String> display() {
+        return List.of("Last", "Version", "of", "this", "poc", "gitOps");
+    }
 }
