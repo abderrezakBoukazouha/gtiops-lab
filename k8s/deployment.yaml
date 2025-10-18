@@ -16,6 +16,6 @@ spec:
       containers:
         - name: my-spring-app
           # IMPORTANT: This is a placeholder!
-          image: spring-app-sandbox:latest
+          image: ghcr.io/abderrezakBoukazouha/gtiops-lab:aadefff
           ports:
             - containerPort: 8080
