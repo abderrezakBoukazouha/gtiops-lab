@@ -13,9 +13,11 @@ spec:
       labels:
         app: my-spring-app
     spec:
+      # This is the new section you need to add!
+      imagePullSecrets:
+        - name: ghcr-creds
       containers:
         - name: my-spring-app
-          # IMPORTANT: This is a placeholder!
-          image: ghcr.io/abderrezakBoukazouha/gtiops-lab:b16a34d
+          image: ghcr.io/abderrezakBoukazouha/gtiops-lab:b16a34d # This will be updated by the next CI run
           ports:
             - containerPort: 8080
