@@ -17,6 +17,6 @@ public class SandboxApplication {
 
 	@GetMapping("/get")
 	public String display() {
-		return "Hello";
+		return "Update display message, Version 1 !";
 	}
 }
