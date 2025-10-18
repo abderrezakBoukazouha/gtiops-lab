@@ -1,0 +1,71 @@
+name: Build, Push, and Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+# Set environment variables
+env:
+  # Your GitHub username/org and the repo name
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    # Grant permissions for the workflow to write to GHCR and commit to the repo
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: ./mvnw clean package -DskipTests
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=,format=short # Tag with the short 7-char git SHA
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: ⚙️ Update Kubernetes deployment manifest
+        run: |
+          # Use sed to replace the placeholder with the new image tag
+          # The new image tag is like: ghcr.io/your-username/my-spring-app:a1b2c3d
+          NEW_IMAGE_TAG="ghcr.io/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}"
+          sed -i "s|image:.*|image: ${NEW_IMAGE_TAG}|g" k8s/deployment.yaml
+
+      - name: 🚀 Commit and push the updated manifest
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add k8s/deployment.yaml
+          # Commit only if there are changes
+          git diff-index --quiet HEAD || git commit -m "ci: update deployment image to ${{ steps.meta.outputs.version }}"
+          git push
