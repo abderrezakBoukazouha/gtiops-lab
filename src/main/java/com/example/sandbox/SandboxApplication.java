@@ -17,6 +17,6 @@ public class SandboxApplication {
 
 	@GetMapping("/get")
 	public String display() {
-		return "massive Update display message, Version 2 !";
+		return "another massive Update display message, Version 3 !";
 	}
 }
