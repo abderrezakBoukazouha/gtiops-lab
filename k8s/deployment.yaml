@@ -18,6 +18,6 @@ spec:
         - name: ghcr-creds
       containers:
         - name: my-spring-app
-          image: ghcr.io/abderrezakBoukazouha/gtiops-lab:72cc826
+          image: ghcr.io/abderrezakboukazouha/gtiops-lab:cce80e7
           ports:
             - containerPort: 8080
